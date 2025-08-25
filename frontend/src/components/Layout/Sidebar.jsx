@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FiHome, FiGrid, FiLogOut, FiMenu, FiX } from "react-icons/fi";
+import { FiHome, FiGrid, FiLogOut, FiMenu, FiX, FiBox } from "react-icons/fi";
 import supabase from "../../utils/supabaseClient";
 
 const navLinks = [
   { to: "/dashboard", label: "Dashboard", icon: <FiGrid /> },
-  { to: "/", label: "Home", icon: <FiHome /> },
+  { to: "/inventory", label: "Inventory", icon: <FiBox /> },
   // Add more links as needed
 ];
 
