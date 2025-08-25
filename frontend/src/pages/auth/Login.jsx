@@ -82,9 +82,22 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-green-50 to-white px-4">
-      <div className="w-full max-w-sm bg-white rounded-xl shadow-lg border border-green-200 p-8">
-        <div className="mb-6 text-center">
-          <h1 className="text-3xl font-bold text-blue-700 mb-2">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-green-200 p-10">
+        {/* Logo/Icon */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="bg-gradient-to-r from-blue-600 to-green-500 rounded-full p-3 mb-3 shadow">
+            <svg width="40" height="40" viewBox="0 0 32 32" fill="none">
+              <circle cx="16" cy="16" r="16" fill="#3B82F6" />
+              <path
+                d="M10 18l6-6 6 6"
+                stroke="#fff"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <h1 className="text-3xl font-extrabold text-blue-700 mb-1">
             Sign in to your account
           </h1>
           <p className="text-sm text-green-600">
@@ -103,53 +116,105 @@ const Login = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label
-              className="block text-sm font-medium text-blue-700 mb-1"
-              htmlFor="email"
-            >
-              Email
-            </label>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Email Floating Label */}
+          <div className="relative">
             <input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              className="w-full rounded-md border border-blue-300 px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-green-400 transition"
+              placeholder=" "
+              className="peer w-full rounded-lg border border-blue-200 px-4 py-3 text-gray-900 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-green-400 transition shadow-sm"
               required
               autoComplete="email"
             />
+            <label
+              htmlFor="email"
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 bg-white px-1 transition-all duration-200 pointer-events-none
+                peer-placeholder-shown:top-1/2
+                peer-placeholder-shown:text-gray-400
+                peer-placeholder-shown:text-base
+                peer-focus:-top-2
+                peer-focus:text-xs
+                peer-focus:text-blue-700
+                peer-focus:bg-white
+                peer-focus:px-1
+                peer-focus:translate-y-0
+                peer-focus:font-semibold
+                peer-not-placeholder-shown:-top-2
+                peer-not-placeholder-shown:text-xs
+                peer-not-placeholder-shown:text-blue-700
+                peer-not-placeholder-shown:bg-white
+                peer-not-placeholder-shown:px-1
+                peer-not-placeholder-shown:translate-y-0
+                peer-not-placeholder-shown:font-semibold
+              "
+            >
+              Email
+            </label>
           </div>
 
-          <div>
-            <label
-              className="block text-sm font-medium text-blue-700 mb-1"
-              htmlFor="password"
-            >
-              Password
-            </label>
+          {/* Password Floating Label */}
+          <div className="relative">
             <input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full rounded-md border border-blue-300 px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-blue-400 transition"
+              placeholder=" "
+              className="peer w-full rounded-lg border border-blue-200 px-4 py-3 text-gray-900 bg-transparent focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-blue-400 transition shadow-sm"
               required
               autoComplete="current-password"
             />
+            <label
+              htmlFor="password"
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 bg-white px-1 transition-all duration-200 pointer-events-none
+                peer-placeholder-shown:top-1/2
+                peer-placeholder-shown:text-gray-400
+                peer-placeholder-shown:text-base
+                peer-focus:-top-2
+                peer-focus:text-xs
+                peer-focus:text-green-700
+                peer-focus:bg-white
+                peer-focus:px-1
+                peer-focus:translate-y-0
+                peer-focus:font-semibold
+                peer-not-placeholder-shown:-top-2
+                peer-not-placeholder-shown:text-xs
+                peer-not-placeholder-shown:text-green-700
+                peer-not-placeholder-shown:bg-white
+                peer-not-placeholder-shown:px-1
+                peer-not-placeholder-shown:translate-y-0
+                peer-not-placeholder-shown:font-semibold
+              "
+            >
+              Password
+            </label>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div />
+            <a
+              href="#"
+              className="text-xs text-blue-600 hover:underline transition"
+            >
+              Forgot password?
+            </a>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-md bg-gradient-to-r from-blue-600 to-green-500 hover:from-blue-700 hover:to-green-600 text-white font-semibold px-4 py-2 transition disabled:opacity-60 text-base shadow"
+            className="w-full rounded-lg bg-gradient-to-r from-blue-600 to-green-500 hover:from-blue-700 hover:to-green-600 text-white font-bold px-4 py-2 transition disabled:opacity-60 text-base shadow-lg"
           >
             {loading ? "Processing..." : "Login"}
           </button>
         </form>
+
+        <div className="mt-8 text-xs text-gray-400 text-center">
+          &copy; {new Date().getFullYear()} A&G Services. All rights reserved.
+        </div>
       </div>
     </div>
   );
