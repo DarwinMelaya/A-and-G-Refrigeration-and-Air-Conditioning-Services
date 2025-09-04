@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FiHome, FiGrid, FiLogOut, FiMenu, FiX, FiBox } from "react-icons/fi";
-import supabase from "../../utils/supabaseClient";
+import axios from "axios";
 
 const navLinks = [
   { to: "/dashboard", label: "Dashboard", icon: <FiGrid /> },
@@ -17,15 +17,21 @@ const Sidebar = () => {
 
   useEffect(() => {
     const fetchUsername = async () => {
-      const user = JSON.parse(localStorage.getItem("user"));
+      const userStr = localStorage.getItem("user");
+      if (!userStr || userStr === "undefined") return;
+      const user = JSON.parse(userStr);
       if (user?.email) {
-        const { data } = await supabase
-          .from("user")
-          .select("name")
-          .eq("email", user.email)
-          .maybeSingle();
-        if (data && data.name) {
-          setUsername(data.name);
+        try {
+          const res = await axios.get(
+            `http://localhost:5000/api/user/profile?email=${encodeURIComponent(
+              user.email
+            )}`
+          );
+          if (res.data && res.data.name) {
+            setUsername(res.data.name);
+          }
+        } catch (err) {
+          // Optionally handle error
         }
       }
     };
