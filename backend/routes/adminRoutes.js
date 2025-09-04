@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Admin = require("../models/Admin");
+const Inventory = require("../models/Inventory");
 
 const router = express.Router();
 
@@ -73,6 +74,34 @@ const verifyToken = (req, res, next) => {
 // Protected Route Example
 router.get("/dashboard", verifyToken, (req, res) => {
   res.json({ message: "Welcome to the admin dashboard" });
+});
+
+// Add Inventory Item (Admin only)
+router.post("/inventory", verifyToken, async (req, res) => {
+  try {
+    const { name, price, picture, description } = req.body;
+    if (!name || !price || !picture || !description) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+    // Create new inventory item
+    const newItem = new Inventory({ name, price, picture, description });
+    await newItem.save();
+    res
+      .status(201)
+      .json({ message: "Inventory item added successfully", item: newItem });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+// Get all Inventory Items (Admin only)
+router.get("/inventory", verifyToken, async (req, res) => {
+  try {
+    const items = await Inventory.find();
+    res.status(200).json({ items });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
 });
 
 // Token verification endpoint
