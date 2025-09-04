@@ -4,3 +4,6 @@ export { default as Home } from "./home/Home";
 export { default as Login } from "./auth/Login";
 export { default as Dashboard } from "./admin/Dashboard";
 export { default as Inventory } from "./admin/Inventory";
+
+// User
+export { default as WelcomePage } from "./user/WelcomePage";
