@@ -84,7 +84,13 @@ router.post("/inventory", verifyToken, async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
     // Create new inventory item
-    const newItem = new Inventory({ name, price, picture, description, stock: stock ?? 0 });
+    const newItem = new Inventory({
+      name,
+      price,
+      picture,
+      description,
+      stock: stock ?? 0,
+    });
     await newItem.save();
     res
       .status(201)
@@ -99,6 +105,41 @@ router.get("/inventory", verifyToken, async (req, res) => {
   try {
     const items = await Inventory.find();
     res.status(200).json({ items });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+// Update an Inventory Item (Admin only)
+router.put("/inventory/:id", verifyToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, price, picture, description, stock } = req.body;
+
+    const updates = {};
+    if (name !== undefined) updates.name = name;
+    if (price !== undefined) updates.price = price;
+    if (picture !== undefined) updates.picture = picture;
+    if (description !== undefined) updates.description = description;
+    if (stock !== undefined) updates.stock = stock;
+
+    const updated = await Inventory.findByIdAndUpdate(id, updates, {
+      new: true,
+    });
+    if (!updated) return res.status(404).json({ message: "Item not found" });
+    res.status(200).json({ message: "Inventory item updated", item: updated });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+// Delete an Inventory Item (Admin only)
+router.delete("/inventory/:id", verifyToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await Inventory.findByIdAndDelete(id);
+    if (!deleted) return res.status(404).json({ message: "Item not found" });
+    res.status(200).json({ message: "Inventory item deleted" });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }
