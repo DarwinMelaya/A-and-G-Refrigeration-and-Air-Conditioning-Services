@@ -1,5 +1,7 @@
 import Layout from "../../components/Layout/Layout";
 import AddInventoryModal from "../../components/Modals/AddInventoryModal";
+import EditInventoryModal from "../../components/Modals/EditInventoryModal";
+import DeleteInventoryModal from "../../components/Modals/DeleteInventoryModal";
 import { FiFilter, FiPlus } from "react-icons/fi"; // For filter icon
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -27,6 +29,8 @@ const Inventory = () => {
   const [editStock, setEditStock] = useState(0);
   const [editPicture, setEditPicture] = useState("");
   const [editPreview, setEditPreview] = useState(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
 
   // Removed Add Stock modal/state
 
@@ -131,6 +135,7 @@ const Inventory = () => {
     setEditPicture(item.picture || "");
     setEditPreview(item.picture || null);
     setEditModalOpen(true);
+    setSelectedItem(item);
   };
 
   const submitEditItem = async (e) => {
@@ -166,27 +171,9 @@ const Inventory = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this item?"
-    );
-    if (!confirmed) return;
-    setLoading(true);
-    setMessage("");
-    setError("");
-    try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/api/admin/inventory/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setMessage("Inventory item deleted successfully!");
-    } catch (err) {
-      setError(
-        err.response?.data?.message || "Failed to delete inventory item."
-      );
-    } finally {
-      setLoading(false);
-    }
+  const openDeleteModal = (item) => {
+    setSelectedItem(item);
+    setDeleteModalOpen(true);
   };
 
   return (
@@ -307,7 +294,7 @@ const Inventory = () => {
                         Edit
                       </button>
                       <button
-                        onClick={() => handleDelete(item._id)}
+                        onClick={() => openDeleteModal(item)}
                         className="text-sm bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
                       >
                         Delete
@@ -328,121 +315,20 @@ const Inventory = () => {
         />
 
         {/* Edit Inventory Modal */}
-        {editModalOpen && (
-          <div
-            className="fixed inset-0 z-50 bg-black/40 overflow-y-auto"
-            onClick={() => setEditModalOpen(false)}
-          >
-            <div className="min-h-full flex items-center justify-center p-4 sm:p-6">
-              <div
-                className="bg-white rounded-2xl shadow-xl w-full max-w-md relative max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-4rem)] overflow-y-auto p-6 sm:p-8"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <button
-                  onClick={() => setEditModalOpen(false)}
-                  className="sticky top-0 float-right text-gray-400 hover:text-gray-600 text-2xl font-bold"
-                  aria-label="Close"
-                >
-                  &times;
-                </button>
-                <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-                  Edit Inventory Item
-                </h2>
-                <form
-                  onSubmit={submitEditItem}
-                  className="space-y-5 clear-both"
-                >
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Name
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Name"
-                      value={editName}
-                      onChange={(e) => setEditName(e.target.value)}
-                      className="w-full border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-lg transition"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Price
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="Price"
-                      value={editPrice}
-                      onChange={(e) => setEditPrice(e.target.value)}
-                      className="w-full border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-lg transition"
-                      required
-                      min="0"
-                      step="0.01"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Description
-                    </label>
-                    <textarea
-                      placeholder="Description"
-                      value={editDescription}
-                      onChange={(e) => setEditDescription(e.target.value)}
-                      className="w-full border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-lg transition"
-                      required
-                      rows={3}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Stock
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="0"
-                      value={editStock}
-                      onChange={(e) => setEditStock(Number(e.target.value))}
-                      className="w-full border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-lg transition"
-                      min="0"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Image
-                    </label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleEditImageChange}
-                      className="w-full border border-gray-300 p-2 rounded-lg bg-gray-50"
-                    />
-                  </div>
-                  {editPreview && (
-                    <div className="flex justify-center">
-                      <img
-                        src={editPreview}
-                        alt="Preview"
-                        className="w-32 h-32 object-cover rounded-xl border border-gray-200 shadow mb-2"
-                      />
-                    </div>
-                  )}
-                  <button
-                    type="submit"
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg font-semibold text-lg shadow disabled:opacity-60"
-                    disabled={loading}
-                  >
-                    {loading ? "Saving..." : "Save Changes"}
-                  </button>
-                  {error && (
-                    <div className="text-red-600 text-center font-medium mt-2">
-                      {error}
-                    </div>
-                  )}
-                </form>
-              </div>
-            </div>
-          </div>
-        )}
+        <EditInventoryModal
+          isOpen={editModalOpen}
+          item={selectedItem}
+          onClose={() => setEditModalOpen(false)}
+          onSuccess={(msg) => setMessage(msg)}
+        />
+
+        {/* Delete Inventory Modal */}
+        <DeleteInventoryModal
+          isOpen={deleteModalOpen}
+          item={selectedItem}
+          onClose={() => setDeleteModalOpen(false)}
+          onSuccess={(msg) => setMessage(msg)}
+        />
         {/* Removed Add Stock Modal */}
       </div>
     </Layout>
