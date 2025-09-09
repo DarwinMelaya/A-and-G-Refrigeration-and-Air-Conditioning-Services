@@ -79,12 +79,12 @@ router.get("/dashboard", verifyToken, (req, res) => {
 // Add Inventory Item (Admin only)
 router.post("/inventory", verifyToken, async (req, res) => {
   try {
-    const { name, price, picture, description } = req.body;
+    const { name, price, picture, description, stock } = req.body;
     if (!name || !price || !picture || !description) {
       return res.status(400).json({ message: "All fields are required" });
     }
     // Create new inventory item
-    const newItem = new Inventory({ name, price, picture, description });
+    const newItem = new Inventory({ name, price, picture, description, stock: stock ?? 0 });
     await newItem.save();
     res
       .status(201)
@@ -99,6 +99,35 @@ router.get("/inventory", verifyToken, async (req, res) => {
   try {
     const items = await Inventory.find();
     res.status(200).json({ items });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+// Increment stock for an inventory item
+router.patch("/inventory/:id/stock", verifyToken, async (req, res) => {
+  try {
+    const { amount } = req.body; // positive or negative to adjust
+    const { id } = req.params;
+    const incrementBy = Number(amount);
+    if (!Number.isFinite(incrementBy)) {
+      return res.status(400).json({ message: "amount must be a number" });
+    }
+
+    const updated = await Inventory.findByIdAndUpdate(
+      id,
+      { $inc: { stock: incrementBy } },
+      { new: true }
+    );
+
+    if (!updated) return res.status(404).json({ message: "Item not found" });
+    if (updated.stock < 0) {
+      // rollback if negative
+      await Inventory.findByIdAndUpdate(id, { $inc: { stock: -incrementBy } });
+      return res.status(400).json({ message: "Stock cannot be negative" });
+    }
+
+    res.status(200).json({ message: "Stock updated", item: updated });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }

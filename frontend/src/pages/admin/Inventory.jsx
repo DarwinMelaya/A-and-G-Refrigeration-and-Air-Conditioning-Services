@@ -15,6 +15,12 @@ const Inventory = () => {
   const [inventory, setInventory] = useState([]);
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
+  const [stock, setStock] = useState(0);
+
+  // Add stock modal state
+  const [stockModalOpen, setStockModalOpen] = useState(false);
+  const [stockItemId, setStockItemId] = useState(null);
+  const [stockAmount, setStockAmount] = useState(0);
 
   // Dashboard summary (mocked for now)
   const totalStockValue = inventory.reduce(
@@ -49,7 +55,7 @@ const Inventory = () => {
       }
     };
     fetchInventory();
-  }, [message]); // refetch when message changes (i.e., after add)
+  }, [message]); // refetch when message changes (i.e., after add or stock update)
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -70,9 +76,9 @@ const Inventory = () => {
     setError("");
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.post(
+      await axios.post(
         "http://localhost:5000/api/admin/inventory",
-        { name, price, picture, description },
+        { name, price, picture, description, stock },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -85,8 +91,41 @@ const Inventory = () => {
       setDescription("");
       setPicture("");
       setPreview(null);
+      setStock(0);
+      setModalOpen(false);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to add inventory item.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openAddStockModal = (id) => {
+    setStockItemId(id);
+    setStockAmount(0);
+    setStockModalOpen(true);
+  };
+
+  const submitAddStock = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage("");
+    setError("");
+    try {
+      const token = localStorage.getItem("token");
+      await axios.patch(
+        `http://localhost:5000/api/admin/inventory/${stockItemId}/stock`,
+        { amount: Number(stockAmount) },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setMessage("Stock updated successfully!");
+      setStockModalOpen(false);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to update stock.");
     } finally {
       setLoading(false);
     }
@@ -152,14 +191,15 @@ const Inventory = () => {
                 <th className="px-3 py-2 text-left">Product Name</th>
                 <th className="px-3 py-2 text-left">Price</th>
                 <th className="px-3 py-2 text-left">Description</th>
-                <th className="px-3 py-2 text-left">Stock Status</th>
+                <th className="px-3 py-2 text-left">Stock</th>
+                <th className="px-3 py-2 text-left">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredInventory.length === 0 ? (
                 <tr>
                   <td
-                    colSpan="5"
+                    colSpan="6"
                     className="text-center py-8 text-gray-400 text-lg"
                   >
                     No inventory items found.
@@ -183,16 +223,14 @@ const Inventory = () => {
                     </td>
                     <td className="px-3 py-2">₱{item.price.toFixed(2)}</td>
                     <td className="px-3 py-2">{item.description}</td>
+                    <td className="px-3 py-2">{item.stock || 0}</td>
                     <td className="px-3 py-2">
-                      {(item.stock || 0) > 0 ? (
-                        <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">
-                          In Stock
-                        </span>
-                      ) : (
-                        <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-semibold">
-                          Out of Stock
-                        </span>
-                      )}
+                      <button
+                        onClick={() => openAddStockModal(item._id)}
+                        className="text-sm bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded"
+                      >
+                        Add Stock
+                      </button>
                     </td>
                   </tr>
                 ))
@@ -215,41 +253,7 @@ const Inventory = () => {
               <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
                 Add Inventory Item
               </h2>
-              <form
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  setLoading(true);
-                  setMessage("");
-                  setError("");
-                  try {
-                    const token = localStorage.getItem("token");
-                    await axios.post(
-                      "http://localhost:5000/api/admin/inventory",
-                      { name, price, picture, description },
-                      {
-                        headers: {
-                          Authorization: `Bearer ${token}`,
-                        },
-                      }
-                    );
-                    setMessage("Inventory item added successfully!");
-                    setName("");
-                    setPrice("");
-                    setDescription("");
-                    setPicture("");
-                    setPreview(null);
-                    setModalOpen(false);
-                  } catch (err) {
-                    setError(
-                      err.response?.data?.message ||
-                        "Failed to add inventory item."
-                    );
-                  } finally {
-                    setLoading(false);
-                  }
-                }}
-                className="space-y-5"
-              >
+              <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Name
@@ -293,6 +297,19 @@ const Inventory = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Initial Stock
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="0"
+                    value={stock}
+                    onChange={(e) => setStock(Number(e.target.value))}
+                    className="w-full border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-lg transition"
+                    min="0"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     Image
                   </label>
                   <input
@@ -324,6 +341,50 @@ const Inventory = () => {
                     {message}
                   </div>
                 )}
+                {error && (
+                  <div className="text-red-600 text-center font-medium mt-2">
+                    {error}
+                  </div>
+                )}
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Add Stock Modal */}
+        {stockModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm relative">
+              <button
+                onClick={() => setStockModalOpen(false)}
+                className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl font-bold"
+                aria-label="Close"
+              >
+                &times;
+              </button>
+              <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">
+                Add Stock
+              </h3>
+              <form onSubmit={submitAddStock} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Amount
+                  </label>
+                  <input
+                    type="number"
+                    value={stockAmount}
+                    onChange={(e) => setStockAmount(e.target.value)}
+                    className="w-full border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-lg transition"
+                    step="1"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-semibold shadow"
+                  disabled={loading}
+                >
+                  {loading ? "Saving..." : "Save"}
+                </button>
                 {error && (
                   <div className="text-red-600 text-center font-medium mt-2">
                     {error}
