@@ -67,25 +67,35 @@ const AddInventoryModal = ({ isOpen, onClose, onSuccess }) => {
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/40 overflow-y-auto"
+      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm overflow-y-auto"
       onClick={onClose}
+      role="dialog"
+      aria-modal="true"
     >
       <div className="min-h-full flex items-center justify-center p-4 sm:p-6">
         <div
-          className="bg-white rounded-2xl shadow-xl w-full max-w-md relative max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-4rem)] overflow-y-auto p-6 sm:p-8"
+          className="w-full max-w-lg bg-white rounded-lg border border-gray-200 shadow-lg relative overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
-          <button
-            onClick={onClose}
-            className="sticky top-0 float-right text-gray-400 hover:text-gray-600 text-2xl font-bold"
-            aria-label="Close"
-          >
-            &times;
-          </button>
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-            Add Inventory Item
-          </h2>
-          <form onSubmit={handleSubmit} className="space-y-5 clear-both">
+          <div className="flex items-start justify-between px-6 py-4 border-b">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">
+                Add Inventory Item
+              </h2>
+              <p className="text-sm text-gray-500">
+                Create a new product and set its initial details.
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              className="ml-4 inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              aria-label="Close"
+              type="button"
+            >
+              ✕
+            </button>
+          </div>
+          <form onSubmit={handleSubmit} className="px-6 py-4 space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Name
@@ -95,7 +105,7 @@ const AddInventoryModal = ({ isOpen, onClose, onSuccess }) => {
                 placeholder="Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-lg transition"
+                className="w-full border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-2.5 rounded-md transition bg-white"
                 required
               />
             </div>
@@ -108,7 +118,7 @@ const AddInventoryModal = ({ isOpen, onClose, onSuccess }) => {
                 placeholder="Price"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                className="w-full border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-lg transition"
+                className="w-full border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-2.5 rounded-md transition bg-white"
                 required
                 min="0"
                 step="0.01"
@@ -122,7 +132,7 @@ const AddInventoryModal = ({ isOpen, onClose, onSuccess }) => {
                 placeholder="Description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-lg transition"
+                className="w-full border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-2.5 rounded-md transition bg-white"
                 required
                 rows={3}
               />
@@ -136,7 +146,7 @@ const AddInventoryModal = ({ isOpen, onClose, onSuccess }) => {
                 placeholder="0"
                 value={stock}
                 onChange={(e) => setStock(Number(e.target.value))}
-                className="w-full border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-3 rounded-lg transition"
+                className="w-full border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 p-2.5 rounded-md transition bg-white"
                 min="0"
               />
             </div>
@@ -148,7 +158,7 @@ const AddInventoryModal = ({ isOpen, onClose, onSuccess }) => {
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
-                className="w-full border border-gray-300 p-2 rounded-lg bg-gray-50"
+                className="w-full border border-gray-200 p-2 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-100"
                 required
               />
             </div>
@@ -157,28 +167,38 @@ const AddInventoryModal = ({ isOpen, onClose, onSuccess }) => {
                 <img
                   src={preview}
                   alt="Preview"
-                  className="w-32 h-32 object-cover rounded-xl border border-gray-200 shadow mb-2"
+                  className="w-32 h-32 object-cover rounded-md border border-gray-200 shadow-sm mb-2"
                 />
               </div>
             )}
-            <button
-              type="submit"
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white py-3 rounded-lg font-semibold text-lg shadow hover:from-blue-700 hover:to-blue-600 transition disabled:opacity-60"
-              disabled={loading}
-            >
-              {loading ? "Adding..." : "Add Inventory"}
-            </button>
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
+                disabled={loading}
+              >
+                {loading ? "Adding..." : "Add Inventory"}
+              </button>
+            </div>
             {message && (
-              <div className="text-green-600 text-center font-medium mt-2">
+              <div className="text-green-600 text-center font-medium">
                 {message}
               </div>
             )}
             {error && (
-              <div className="text-red-600 text-center font-medium mt-2">
+              <div className="text-red-600 text-center font-medium">
                 {error}
               </div>
             )}
           </form>
+          <div className="h-4" />
         </div>
       </div>
     </div>

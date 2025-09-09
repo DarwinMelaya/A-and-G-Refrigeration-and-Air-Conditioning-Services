@@ -24,36 +24,46 @@ const DeleteInventoryModal = ({ isOpen, item, onClose, onSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/40" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+    >
       <div className="min-h-full flex items-center justify-center p-4">
         <div
-          className="bg-white rounded-2xl shadow-xl w-full max-w-sm relative p-6"
+          className="w-full max-w-sm bg-white rounded-lg border border-gray-200 shadow-lg relative overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
-          <button
-            onClick={onClose}
-            className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl font-bold"
-            aria-label="Close"
-          >
-            &times;
-          </button>
-          <h3 className="text-xl font-bold text-gray-800 mb-2 text-center">
-            Delete Inventory Item
-          </h3>
-          <p className="text-gray-600 text-center mb-6">
-            Are you sure you want to delete "{item.name}"? This action cannot be
-            undone.
-          </p>
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex items-start justify-between px-6 py-4 border-b">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Delete Inventory Item
+            </h3>
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+              className="ml-4 inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              aria-label="Close"
+              type="button"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="px-6 py-4">
+            <p className="text-gray-600">
+              Are you sure you want to delete "{item.name}"? This action cannot
+              be undone.
+            </p>
+          </div>
+          <div className="px-6 py-4 border-t flex items-center justify-end gap-2 bg-gray-50">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 rounded-md border border-gray-200 text-gray-700 hover:bg-white"
             >
               Cancel
             </button>
             <button
               onClick={confirmDelete}
-              className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white"
+              className="px-4 py-2 rounded-md bg-red-600 hover:bg-red-700 text-white"
             >
               Delete
             </button>
