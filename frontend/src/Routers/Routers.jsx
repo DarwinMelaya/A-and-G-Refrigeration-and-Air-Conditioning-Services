@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Dashboard, Inventory, Login, WelcomePage } from "../pages";
+import { Dashboard, Inventory, Login, WelcomePage, Main } from "../pages";
 import ProtectedRoute from "../components/Security/ProtectedRoutes";
 
 export const Routers = () => {
@@ -8,6 +8,7 @@ export const Routers = () => {
       <Routes>
         <Route path="/" element={<WelcomePage />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/main" element={<Main />} />
         <Route
           path="/dashboard"
           element={
