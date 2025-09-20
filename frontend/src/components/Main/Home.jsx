@@ -1,4 +1,38 @@
+import { useEffect, useRef } from "react";
+
 const Home = () => {
+  const titleRef = useRef(null);
+  const subtitleRef = useRef(null);
+  const descriptionRef = useRef(null);
+  const decorativeRef = useRef(null);
+
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: "0px 0px -50px 0px",
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("animate-fadeInUp");
+        }
+      });
+    }, observerOptions);
+
+    const elements = [
+      titleRef.current,
+      subtitleRef.current,
+      descriptionRef.current,
+      decorativeRef.current,
+    ];
+    elements.forEach((el) => {
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image with Gradient Overlay */}
@@ -17,19 +51,29 @@ const Home = () => {
       <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
         {/* Main Title */}
         <div className="mb-8">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight mb-4 drop-shadow-2xl relative">
+          <h1
+            ref={titleRef}
+            className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight mb-4 drop-shadow-2xl relative opacity-0 transform translate-y-8 transition-all duration-1000 ease-out"
+          >
             <span className="relative z-10">A&G REFRIGERATION AND</span>
             <div className="absolute inset-0 text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-4 text-yellow-400 blur-sm opacity-80 animate-pulse">
               A&G REFRIGERATION AND
             </div>
           </h1>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight mb-4 drop-shadow-2xl relative">
+          <h2
+            ref={subtitleRef}
+            className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight mb-4 drop-shadow-2xl relative opacity-0 transform translate-y-8 transition-all duration-1000 ease-out"
+            style={{ transitionDelay: "200ms" }}
+          >
             <span className="relative z-10">AIRCONDITIONING</span>
             <div className="absolute inset-0 text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-4 text-yellow-400 blur-sm opacity-80 animate-pulse">
               AIRCONDITIONING
             </div>
           </h2>
-          <h3 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight drop-shadow-2xl relative">
+          <h3
+            className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight drop-shadow-2xl relative opacity-0 transform translate-y-8 transition-all duration-1000 ease-out"
+            style={{ transitionDelay: "400ms" }}
+          >
             <span className="relative z-10">SERVICES</span>
             <div className="absolute inset-0 text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight text-yellow-400 blur-sm opacity-80 animate-pulse">
               SERVICES
@@ -38,7 +82,11 @@ const Home = () => {
         </div>
 
         {/* Bottom Text */}
-        <div className="mt-12 max-w-4xl mx-auto">
+        <div
+          ref={descriptionRef}
+          className="mt-12 max-w-4xl mx-auto opacity-0 transform translate-y-8 transition-all duration-1000 ease-out"
+          style={{ transitionDelay: "600ms" }}
+        >
           <p className="text-lg sm:text-xl lg:text-2xl text-white/90 leading-relaxed font-medium drop-shadow-lg">
             Our commitment to quality, integrity, and customer satisfaction is
             evident in every aspect of our operations.
@@ -46,7 +94,11 @@ const Home = () => {
         </div>
 
         {/* Decorative Elements */}
-        <div className="mt-16 flex justify-center space-x-4">
+        <div
+          ref={decorativeRef}
+          className="mt-16 flex justify-center space-x-4 opacity-0 transform translate-y-8 transition-all duration-1000 ease-out"
+          style={{ transitionDelay: "800ms" }}
+        >
           <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse"></div>
           <div
             className="w-2 h-2 bg-white/60 rounded-full animate-pulse"
